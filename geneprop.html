@@ -1,0 +1,123 @@
+<style>
+canvas {
+	border-style: solid;
+    border-width: 5px;
+}
+</style>
+
+<canvas id="canvas" width="1000" height="510">
+
+</canvas>
+
+<script>
+setInterval(update, 16);
+setInterval(draw, 16);
+var canvas = document.getElementById("canvas");
+var context = canvas.getContext("2d");
+
+var gameobjects = [];
+function blue(x, y, spawnchance, seedchance) {
+	this.x = x;
+	this.y = y;
+	this.spawnchance = spawnchance;
+	this.seedchance = seedchance;
+	
+	this.mutate = function() {
+		if (Math.random() > 0.5) {
+			spawnchance += 0.001;
+			seedchance -= 0.001;
+		} else {
+			spawnchance -= 0.001;
+			seedchance += 0.001;
+		}
+	}
+	
+	this.update = function() {
+		this.y += 4;
+		if (this.y >= 500) {
+			gameobjects.splice(gameobjects.indexOf(this), 1);
+			gameobjects.push(new green(this.x, this.y, spawnchance, seedchance));
+		}
+	}
+	this.draw = function() {
+		context.fillStyle = "#22BBFF";
+		context.fillRect(this.x, this.y, 4, 4);
+	}
+}
+
+function green(x, y, spawnchance, seedchance) {
+	this.x = x;
+	this.y = y;
+	this.spawnchance = spawnchance;
+	this.seedchance = seedchance;
+	this.seeded = false;
+	this.lifetime = 50000;
+	
+	this.mutate = function() {
+		if (Math.random() > 0.5) {
+			spawnchance += 0.001;
+			seedchance -= 0.001;
+		} else {
+			spawnchance -= 0.001;
+			seedchance += 0.001;
+		}
+
+	}
+	
+	this.update = function() {
+		this.x = clamp(this.x, 0, 995);
+		this.lifetime -= gameobjects.length;
+		if (this.lifetime <= 0) {
+			gameobjects.splice(gameobjects.indexOf(this), 1);
+		}
+		this.y -= 1 - spawnchance;
+		if (Math.random() > 0.5) {
+			this.x += seedchance * 100;
+		} else {
+			this.x -= spawnchance * 100;
+		}
+		if (this.y <= 0) {
+			gameobjects.splice(gameobjects.indexOf(this), 1);
+		}		
+		if (Math.random() > 1 - seedchance) {
+			var newblue = new blue(this.x, this.y, spawnchance, seedchance);
+			newblue.mutate();
+			gameobjects.push(newblue);
+			this.seeded = true;
+		}
+		if (Math.random() > 1 - spawnchance) {
+			var newgreen = new green(this.x, this.y + 10, spawnchance, seedchance);
+			newgreen.mutate();
+			gameobjects.push(newgreen);
+		}
+	}
+	
+	this.draw = function() {
+		context.fillStyle = "#22FFBB";
+		context.fillRect(this.x, this.y, 4, 4);
+	}
+	
+	
+}
+
+gameobjects.push(new blue(400, 200, 0.003, 0.003));
+
+
+function update() {
+	gameobjects.forEach(function(element, index, array) {
+		element.update();
+	});
+}
+
+function draw() {
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	gameobjects.forEach(function(element, index, array) {
+		element.draw();	
+	});
+}
+
+function clamp(n, l, h) {
+	return Math.min(Math.max(n, l), h);
+}
+
+</script>
