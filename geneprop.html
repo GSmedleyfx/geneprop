@@ -5,11 +5,18 @@ canvas {
 }
 </style>
 
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</head>
+
 <canvas id="canvas" width="1000" height="510">
 
 </canvas>
+<button onclick="gameobjects = []; gameobjects.push(new blue(400, 200, 0.003, 0.003));">
+Reset
+</button>
 
-<script>
+<script id="game">
 setInterval(update, 16);
 setInterval(draw, 16);
 var canvas = document.getElementById("canvas");
@@ -52,7 +59,7 @@ function green(x, y, spawnchance, seedchance) {
 	this.spawnchance = spawnchance;
 	this.seedchance = seedchance;
 	this.seeded = false;
-	this.lifetime = 50000 - gameobjects.length * 10;
+	this.lifetime = 50000 - gameobjects.length * 100;
 	
 	this.mutate = function() {
 		if (Math.random() > 0.5) {
@@ -83,7 +90,7 @@ function green(x, y, spawnchance, seedchance) {
 			var newblue = new blue(this.x, this.y, spawnchance, seedchance);
 			newblue.mutate();
 			gameobjects.push(newblue);
-			this.seeded = true;
+			this.lifespan -= 10000;
 		}
 		if (Math.random() > 1 - spawnchance) {
 			var newgreen = new green(this.x, this.y + 10, spawnchance, seedchance);
