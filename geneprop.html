@@ -33,6 +33,7 @@ function blue(x, y, spawnchance, seedchance) {
 	}
 	
 	this.update = function() {
+		this.x = clamp(this.x, 0, 995);
 		this.y += 4;
 		if (this.y >= 500) {
 			gameobjects.splice(gameobjects.indexOf(this), 1);
@@ -51,7 +52,7 @@ function green(x, y, spawnchance, seedchance) {
 	this.spawnchance = spawnchance;
 	this.seedchance = seedchance;
 	this.seeded = false;
-	this.lifetime = 50000;
+	this.lifetime = 50000 - gameobjects.length * 10;
 	
 	this.mutate = function() {
 		if (Math.random() > 0.5) {
@@ -61,12 +62,11 @@ function green(x, y, spawnchance, seedchance) {
 			spawnchance -= 0.001;
 			seedchance += 0.001;
 		}
-
 	}
 	
 	this.update = function() {
 		this.x = clamp(this.x, 0, 995);
-		this.lifetime -= gameobjects.length;
+		this.lifetime -= 1;
 		if (this.lifetime <= 0) {
 			gameobjects.splice(gameobjects.indexOf(this), 1);
 		}
@@ -90,6 +90,8 @@ function green(x, y, spawnchance, seedchance) {
 			newgreen.mutate();
 			gameobjects.push(newgreen);
 		}
+		
+		this.x = clamp(this.x, 0, 995);
 	}
 	
 	this.draw = function() {
